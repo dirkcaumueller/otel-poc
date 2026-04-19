@@ -1,0 +1,205 @@
+receivers:
+
+  # PostgreSQL Default Metrics
+  postgresql:
+    endpoint: 127.0.0.1:5432
+    transport: tcp
+    username: otel
+    password: otel
+    collection_interval: 10s
+    databases:
+      - postgres
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+    connection_pool:
+      max_open: 5
+      max_idle: 2
+      max_lifetime: 0
+      max_idle_time: 10m
+
+  # PostgreSQL Logs
+  file_log/postgresql:
+    include: [/var/log/postgresql/*.json]
+    start_at: end
+    operators:
+      - type: json_parser
+        if: body matches "^{.*}$"
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%d %H:%M:%S.%f %Z'
+        severity:
+          parse_from: attributes.error_severity
+          mapping: 
+            info: INFO
+            info2: NOTICE
+            info4: LOG
+            warn: WARNING
+            error: ERROR
+            fatal: FATAL
+            fatal4: PANIC
+            debug:
+              - DEBUG1
+              - DEBUG2
+              - DEBUG3
+              - DEBUG4
+              - DEBUG5
+      - type: remove
+        field: attributes.timestamp
+      - type: remove
+        field: attributes.error_severity
+      - type: move
+        if: "attributes.user != nil"
+        from: attributes["user"]
+        to: attributes["user.name"]
+      - type: move
+        if: "attributes.dbname != nil"
+        from: attributes["dbname"]
+        to: attributes["db.namespace"]
+      - type: move
+        if: "attributes.remote_host != nil"
+        from: attributes["remote_host"]
+        to: attributes["client.address"]
+      - type: move
+        if: "attributes.remote_port != nil"
+        from: attributes["remote_port"]
+        to: attributes["client.port"]
+      - type: move
+        if: "attributes.state_code != nil"
+        from: attributes["state_code"]
+        to: attributes["db.response.status_code"]
+      - type: move
+        if: "attributes.ps != nil"
+        from: attributes["ps"]
+        to: attributes["process.status"]
+      - type: move
+        if: "attributes.leader_pid != nil"
+        from: attributes["leader_pid"]
+        to: attributes["process.parent_pid"]
+      - type: move
+        if: "attributes.session_id != nil"
+        from: attributes["session_id"]
+        to: attributes["session.id"]
+      - type: move
+        if: "attributes.func_name != nil"
+        from: attributes["func_name"]
+        to: attributes["code.function.name"]
+      - type: move
+        if: "attributes.file_name != nil"
+        from: attributes["file_name"]
+        to: attributes["code.file.path"]
+      - type: move
+        if: "attributes.file_line_num != nil"
+        from: attributes["file_line_num"]
+        to: attributes["code.line.number"]
+      - type: move
+        from: body
+        to: attributes["log.record.original"]
+      - type: copy
+        from: attributes["session.id"]
+        to: attributes["postgresql.session_id"]
+      - type: move
+        if: "attributes.txid != nil"
+        from: attributes["txid"]
+        to: attributes["postgresql.txid"]
+      - type: move
+        if: "attributes.vxid != nil"
+        from: attributes["vxid"]
+        to: attributes["postgresql.vxid"]
+      - type: move
+        if: "attributes.query_id != nil"
+        from: attributes["query_id"]
+        to: attributes["postgresql.query_id"]
+      - type: move
+        if: "attributes.interal_query != nil"
+        from: attributes["internal_query"]
+        to: attributes["postgresql.internal_query"]
+      - type: move
+        if: "attributes.backend_type != nil"
+        from: attributes["backend_type"]
+        to: attributes["postgresql.backend_type"]
+      - type: move
+        if: "attributes.detail != nil"
+        from: attributes["detail"]
+        to: attributes["postgresql.detail"]
+      - type: move
+        if: "attributes.hint != nil"
+        from: attributes["hint"]
+        to: attributes["postgresql.hint"]
+      - type: move
+        if: "attributes.context != nil"
+        from: attributes["context"]
+        to: attributes["postgresql.context"]
+      - type: move
+        if: "attributes.line_num != nil"
+        from: attributes["line_num"]
+        to: attributes["postgresql.line_num"]
+      - type: move
+        if: "attributes.cursor_position != nil"
+        from: attributes["cursor_position"]
+        to: attributes["postgresql.cursor_position"]
+      - type: move
+        if: "attributes.internal_position != nil"
+        from: attributes["internal_position"]
+        to: attributes["postgresql.internal_position"]
+      - type: move
+        if: "attributes.application_name != nil"
+        from: attributes["application_name"]
+        to: attributes["postgresql.application_name"]
+      - type: move
+        if: "attributes.pid != nil"
+        from: attributes["pid"]
+        to: resource["process.id"]
+      # PostgreSQL - Duration
+      - type: regex_parser
+        if: 'attributes.message != nil and attributes.message matches "^duration:"'
+        regex: '(?:duration:\s+(?P<pg_duration_ms>[0-9.]+)\s+ms)?(?:\s*statement:\s+(?P<pg_statement>.*))?$'
+        parse_from: attributes.message
+        parse_to: attributes
+      - type: move
+        if: "attributes.pg_statement != nil"
+        from: attributes["pg_statement"]
+        to: attributes["db.query.text"]
+      - type: move
+        if: "attributes.statement != nil"
+        from: attributes["statement"]
+        to: attributes["db.query.text"]
+      - type: move
+        if: "attributes.pg_duration_ms != nil"
+        from: attributes["pg_duration_ms"]
+        to: attributes["db.query.duration"]
+      # PGAudit Logs
+      - type: regex_parser
+        if: 'attributes.message != nil and attributes.message matches "^AUDIT:"'
+        regex: '^AUDIT:\s+(?P<audit_type>[^,]+),(?P<statement_id>[^,]+),(?P<substatement_id>[^,]*),(?P<audit_class>[^,]+),(?P<command>[^,]*),(?P<object_type>[^,]*),(?P<object_name>[^,]*),"?(?P<statement>[^"]*)"?,(?P<parameter>[^,]*)$'
+        parse_from: attributes.message
+        parse_to: attributes.pgaudit
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.audit_type
+        to: attributes.pgaudit.type
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.statement_id
+        to: attributes.pgaudit.statement.id
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.audit_class
+        to: attributes.pgaudit.class
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.command
+        to: attributes.pgaudit.command
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.object_name
+        to: attributes.pgaudit.object.name
+      - type: move
+        if: attributes.pgaudit != nil
+        from: attributes.pgaudit.statement
+        to: attributes.pgaudit.statement.text
+      # Must be last operator-action
+      - type: move
+        if: "attributes.message != nil"
+        from: attributes["message"]
+        to: body

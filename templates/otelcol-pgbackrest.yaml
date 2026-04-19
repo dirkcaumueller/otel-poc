@@ -1,0 +1,93 @@
+receivers:
+
+  # pgbackrest Metrics
+  sqlquery/pgbackrest:
+    driver: postgres
+    host: 127.0.0.1
+    port: 5432
+    database: postgres
+    username: otel
+    password: otel
+    additional_params:
+      sslmode: disable
+    collection_interval: 600s
+    max_open_conn: 1
+    queries:
+      - sql: |
+          SELECT
+            data->>'name' AS stanza,
+            data->'status'->>'message' AS message,
+            COALESCE((data->'status'->>'code')::int, 99) AS value
+          FROM jsonb_array_elements(pgbackrest.pgbackrest_info()) AS data
+        metrics:
+          - metric_name: pgbackrest_stanza_status
+            value_column: "value"
+            value_type: int
+            attribute_columns: ["stanza", "message"]
+            data_type: gauge
+            description: "Current stanza status (0 - ok, 1 - missing stanza path, 2 - no valid backups, 3 - missing stanza data, 4 - different across repos, 5 - database mismatch across repos, 6 - requested backup not found, 99 - other)"
+      - sql: |
+          SELECT
+            data->>'name' AS stanza,
+            repo->'status'->>'message' AS message,
+            repo->>'cipher' AS cipher,
+            repo->>'key' AS repo_key,
+            COALESCE((repo->'status'->>'code')::int, 99) AS value
+          FROM jsonb_array_elements(pgbackrest.pgbackrest_info()) AS data
+          CROSS JOIN LATERAL jsonb_array_elements(data->'repo') AS repo
+        metrics:
+          - metric_name: pgbackrest_repo_status
+            value_column: "value"
+            value_type: int
+            attribute_columns: ["stanza", "repo_key", "cipher", "message"]
+            data_type: gauge
+            description: "Current stanza status (0 - ok, 1 - missing stanza path, 2 - no valid backups, 3 - missing stanza data, 4 - different across repos, 5 - database mismatch across repos, 6 - requested backup not found, 99 - other)"
+      - sql: |
+          SELECT
+            data->'name' AS stanza,
+            ((data->'backup'->(jsonb_array_length(data->'backup') - 1))->'timestamp'->>'stop')::numeric AS value,
+            (data->'archive'->(jsonb_array_length(data->'archive') - 1))->>'max' AS last_archived_wal,
+            ((data->'backup'->(jsonb_array_length(data->'backup') - 1))->'database'->>'repo-key')::int AS repo_key
+          FROM jsonb_array_elements(pgbackrest.pgbackrest_info()) AS data
+        metrics:
+          - metric_name: pgbackrest_last_successful_backup_for_stanza
+            value_column: "value"
+            value_type: double
+            attribute_columns: ["stanza", "repo_key"]
+            data_type: gauge
+            description: "Get time of last successful backup and last archived WAL segment for stanza"
+
+  # pgbackrest Logs
+  file_log/pgbackrest:
+    include: [/var/log/pgbackrest/db-*.log]
+    start_at: end
+    operators:
+      - type: filter
+        expr: 'body.message matches "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}.*"'
+      - type: regex_parser
+        regex: '^(?<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}) (?<process_id>P\d{2,3})\s*(?<error_severity>\S*): (?<message>(?s).*)$'
+        timestamp:
+          parse_from: attributes.timestamp
+          layout: '%Y-%m-%d %H:%M:%S.%L'
+        severity:
+          parse_from: attributes.error_severity
+          mapping:
+            trace: TRACE
+            debug: DEBUG
+            debug2: DETAIL
+            info: INFO
+            warn: WARN
+            error: ERROR
+      - type: move
+        if: attributes["process_id"] != nil
+        from: attributes["process_id"]
+        to: attributes["process.pid"]
+      - type: move
+        if: body != nil
+        from: body
+        to: attributes["log.record.original"]
+      # Must be last operator-action
+      - type: move
+        if: "attributes.message != nil"
+        from: attributes["message"]
+        to: body

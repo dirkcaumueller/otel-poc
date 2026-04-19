@@ -1,0 +1,304 @@
+receivers:
+
+  # etcd Logs
+  file_log/etcd:
+    include: [/var/log/etcd/etcd.log]
+    start_at: end
+    operators:
+      - type: json_parser
+        parse_from: body
+        parse_to: attributes
+      - type: time_parser
+        parse_from: attributes.ts
+        layout: '%Y-%m-%dT%H:%M:%S.%f%z'
+      - type: severity_parser
+        parse_from: attributes.level
+        mapping:
+          debug: debug
+          info: info
+          warn: warn
+          warning: warn
+          error: error
+          panic: fatal
+          fatal: fatal
+      - type: move
+        if: attributes["cluster-id"] != nil
+        from: attributes.cluster-id
+        to: resource["cluster.id"]
+      - type: move
+        if: attributes["local-member-id"] != nil
+        from: attributes.local-member-id
+        to: resource["etcd.member.id"]
+      - type: move
+        if: attributes["cluster-version"] != nil
+        from: attributes.cluster-version
+        to: resource["cluster.version"]
+      - type: move
+        if: attributes["request-id"] != nil
+        from: attributes.request-id
+        to: attributes["trace.id"]
+      - type: move
+        if: attributes["stream-id"] != nil
+        from: attributes.stream-id
+        to: attributes["span.id"]
+      - type: move
+        if: attributes["caller"] != nil
+        from: attributes.caller
+        to: attributes["code.filepath"]
+      - type: move
+        if: attributes["func"] != nil
+        from: attributes.func
+        to: attributes["code.function"]
+      - type: move
+        if: attributes["remote-peer-id"] != nil
+        from: attributes.remote-peer-id
+        to: attributes["peer.id"]
+      - type: move
+        if: attributes["remote-peer-urls"] != nil
+        from: attributes.remote-peer-urls
+        to: attributes["peer.urls"]
+      - type: move
+        if: attributes["peer"] != nil
+        from: attributes.peer
+        to: attributes["peer.address"]
+      - type: move
+        if: attributes["took"] != nil
+        from: attributes.took
+        to: attributes["duration"]
+      - type: move
+        if: attributes["expected-duration"] != nil
+        from: attributes.expected-duration
+        to: attributes["duration.expected"]
+      - type: move
+        if: attributes["latency"] != nil
+        from: attributes.latency
+        to: attributes["latency"]
+      - type: move
+        if: attributes["request-size"] != nil
+        from: attributes.request-size
+        to: attributes["http.request.size"]
+      - type: move
+        if: attributes["response-size"] != nil
+        from: attributes.response-size
+        to: attributes["http.response.size"]
+      - type: move
+        if: attributes["response-revision"] != nil
+        from: attributes.response-revision
+        to: attributes["etcd.response.revision"]
+      - type: move
+        if: attributes["response-type"] != nil
+        from: attributes.response-type
+        to: attributes["etcd.response.type"]
+      - type: move
+        if: attributes["key"] != nil
+        from: attributes.key
+        to: attributes["etcd.key"]
+      - type: move
+        if: attributes["range_end"] != nil
+        from: attributes.range_end
+        to: attributes["etcd.range_end"]
+      - type: move
+        if: attributes["prefix"] != nil
+        from: attributes.prefix
+        to: attributes["etcd.prefix"]
+      - type: move
+        if: attributes["value"] != nil
+        from: attributes.value
+        to: attributes["etcd.value"]
+      - type: move
+        if: attributes["lease"] != nil
+        from: attributes.lease
+        to: attributes["etcd.lease"]
+      - type: move
+        if: attributes["ttl"] != nil
+        from: attributes.ttl
+        to: attributes["etcd.ttl"]
+      - type: move
+        if: attributes["revision"] != nil
+        from: attributes.revision
+        to: attributes["etcd.revision"]
+      - type: move
+        if: attributes["index"] != nil
+        from: attributes.index
+        to: attributes["etcd.index"]
+      - type: move
+        if: attributes["term"] != nil
+        from: attributes.term
+        to: attributes["etcd.raft.term"]
+      - type: move
+        if: attributes["commit"] != nil
+        from: attributes.commit
+        to: attributes["etcd.raft.commit"]
+      - type: move
+        if: attributes["raft-index"] != nil
+        from: attributes.raft-index
+        to: attributes["etcd.raft.index"]
+      - type: move
+        if: attributes["raft-applied-index"] != nil
+        from: attributes.raft-applied-index
+        to: attributes["etcd.raft.applied_index"]
+      - type: move
+        if: attributes["leader"] != nil
+        from: attributes.leader
+        to: attributes["etcd.raft.leader"]
+      - type: move
+        if: attributes["vote"] != nil
+        from: attributes.vote
+        to: attributes["etcd.raft.vote"]
+      - type: move
+        if: attributes["member-id"] != nil
+        from: attributes.member-id
+        to: attributes["etcd.member.id"]
+      - type: move
+        if: attributes["member-name"] != nil
+        from: attributes.member-name
+        to: attributes["etcd.member.name"]
+      - type: move
+        if: attributes["member-peer-urls"] != nil
+        from: attributes.member-peer-urls
+        to: attributes["etcd.member.peer_urls"]
+      - type: move
+        if: attributes["snapshot-index"] != nil
+        from: attributes.snapshot-index
+        to: attributes["etcd.snapshot.index"]
+      - type: move
+        if: attributes["snapshot-term"] != nil
+        from: attributes.snapshot-term
+        to: attributes["etcd.snapshot.term"]
+      - type: move
+        if: attributes["snapshot-size"] != nil
+        from: attributes.snapshot-size
+        to: attributes["etcd.snapshot.size"]
+      - type: move
+        if: attributes["txn-id"] != nil
+        from: attributes.txn-id
+        to: attributes["etcd.transaction.id"]
+      - type: move
+        if: attributes["operations"] != nil
+        from: attributes.operations
+        to: attributes["etcd.operations"]
+      - type: move
+        if: attributes["success"] != nil
+        from: attributes.success
+        to: attributes["etcd.success"]
+      - type: move
+        if: attributes["error"] != nil
+        from: attributes.error
+        to: attributes["error.message"]
+      - type: move
+        if: attributes["error-code"] != nil
+        from: attributes.error-code
+        to: attributes["error.code"]
+      - type: move
+        if: attributes["error-type"] != nil
+        from: attributes.error-type
+        to: attributes["error.type"]
+      - type: move
+        if: attributes["watch-id"] != nil
+        from: attributes.watch-id
+        to: attributes["etcd.watch.id"]
+      - type: move
+        if: attributes["watch-revision"] != nil
+        from: attributes.watch-revision
+        to: attributes["etcd.watch.revision"]
+      - type: move
+        if: attributes["events"] != nil
+        from: attributes.events
+        to: attributes["etcd.watch.events"]
+      - type: move
+        if: attributes["compact-revision"] != nil
+        from: attributes.compact-revision
+        to: attributes["etcd.compact.revision"]
+      - type: move
+        if: attributes["defrag-duration"] != nil
+        from: attributes.defrag-duration
+        to: attributes["etcd.defrag.duration"]
+      - type: move
+        if: attributes["alarm-type"] != nil
+        from: attributes.alarm-type
+        to: attributes["etcd.alarm.type"]
+      - type: move
+        if: attributes["alarm-action"] != nil
+        from: attributes.alarm-action
+        to: attributes["etcd.alarm.action"]
+      - type: move
+        if: attributes["user"] != nil
+        from: attributes.user
+        to: attributes["user.name"]
+      - type: move
+        if: attributes["role"] != nil
+        from: attributes.role
+        to: attributes["user.role"]
+      - type: move
+        if: attributes["auth-revision"] != nil
+        from: attributes.auth-revision
+        to: attributes["etcd.auth.revision"]
+      - type: move
+        if: attributes["client-ip"] != nil
+        from: attributes.client-ip
+        to: attributes["client.address"]
+      - type: move
+        if: attributes["client-port"] != nil
+        from: attributes.client-port
+        to: attributes["client.port"]
+      - type: move
+        if: attributes["user-agent"] != nil
+        from: attributes.user-agent
+        to: attributes["user_agent.original"]
+      - type: move
+        if: attributes["grpc-method"] != nil
+        from: attributes.grpc-method
+        to: attributes["rpc.method"]
+      - type: move
+        if: attributes["grpc-service"] != nil
+        from: attributes.grpc-service
+        to: attributes["rpc.service"]
+      - type: move
+        if: attributes["grpc-code"] != nil
+        from: attributes.grpc-code
+        to: attributes["rpc.grpc.status_code"]
+      - type: move
+        if: attributes["http-method"] != nil
+        from: attributes.http-method
+        to: attributes["http.method"]
+      - type: move
+        if: attributes["http-path"] != nil
+        from: attributes.http-path
+        to: attributes["http.target"]
+      - type: move
+        if: attributes["http-status"] != nil
+        from: attributes.http-status
+        to: attributes["http.status_code"]
+      - type: move
+        if: attributes["db-size"] != nil
+        from: attributes.db-size
+        to: attributes["etcd.db.size"]
+      - type: move
+        if: attributes["db-size-in-use"] != nil
+        from: attributes.db-size-in-use
+        to: attributes["etcd.db.size_in_use"]
+      - type: move
+        if: attributes["hash"] != nil
+        from: attributes.hash
+        to: attributes["etcd.db.hash"]
+      - type: move
+        if: attributes["keys"] != nil
+        from: attributes.keys
+        to: attributes["etcd.keys.total"]
+      - type: move
+        if: attributes["watchers"] != nil
+        from: attributes.watchers
+        to: attributes["etcd.watchers.total"]
+      - type: move
+        if: attributes["leases"] != nil
+        from: attributes.leases
+        to: attributes["etcd.leases.total"]
+      - type: move
+        if: body != nil
+        from: body
+        to: attributes["log.record.original"]
+      # Must be last operator-action
+      - type: move
+        if: "attributes.msg != nil"
+        from: attributes.msg
+        to: body

@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-    image: localhost/rocky10-pg:latest
+    image: localhost/otel-poc:latest
     pull_policy: build
     container_name: node1
     hostname: node1
@@ -12,42 +12,23 @@ services:
     cgroup: host
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    command: /sbin/init
     networks:
-      pg-net:
+      otel-poc-net:
         ipv4_address: 172.20.0.11
-    restart: unless-stopped
-
-  node2:
-    image: localhost/rocky10-pg:latest
-    container_name: node2
-    hostname: node2
-    privileged: true
-    cgroup: host
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    command: /sbin/init
-    networks:
-      pg-net:
-        ipv4_address: 172.20.0.12
-    restart: unless-stopped
-
-  node3:
-    image: localhost/rocky10-pg:latest
-    container_name: node3
-    hostname: node3
-    privileged: true
-    cgroup: host
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    command: /sbin/init
-    networks:
-      pg-net:
-        ipv4_address: 172.20.0.13
+    ports:
+      - 2379:2379
+      - 2380:2380
+      - 2381:2381
+      - 5432:5432
+      - 6432:6432
+      - 8008:8008
+      - 8900:8900
+      - 8901:8901
+      - 8902:8902
     restart: unless-stopped
 
 networks:
-  pg-net:
+  otel-poc-net:
     driver: bridge
     ipam:
       config:

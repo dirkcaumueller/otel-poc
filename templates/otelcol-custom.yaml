@@ -1,0 +1,28 @@
+receivers:
+
+  # Custom SQL Metrics
+  sqlquery/custom:
+    driver: postgres
+    host: 127.0.0.1
+    port: 5432
+    database: postgres
+    username: otel
+    password: otel
+    additional_params:
+      sslmode: disable
+    collection_interval: 600s
+    max_open_conn: 1
+    queries:
+      - sql: >
+          SELECT
+            split_part(current_setting('server_version'), '.', 1) AS pg_major,
+            split_part(current_setting('server_version'), '.', -1) AS pg_minor;
+        metrics:
+          - metric_name: custom.pg_major
+            value_column: pg_major
+            attribute_columns: ["pg_major"]
+            description: Current database server major version
+          - metric_name: custom.pg_minor
+            value_column: pg_minor
+            attribute_columns: ["pg_minor"]
+            description: Current database server minor version

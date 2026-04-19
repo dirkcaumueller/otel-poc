@@ -1,0 +1,80 @@
+processors:
+
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 10
+    spike_limit_percentage: 5
+
+  resourcedetection/system:
+    detectors: ["system"]
+    system:
+      hostname_sources: ["dns"]
+
+  resource:
+    attributes:
+      - key: service.name
+        value: pg-db
+        action: upsert
+      - key: db.system.name
+        value: postgresql
+        action: upsert
+      - key: deployment.environment.name
+        value: development
+        action: upsert
+
+  batch:
+    timeout: 10s
+
+exporters:
+
+  prometheus:
+    # curl http://localhost:8900/metrics
+    endpoint: '0.0.0.0:8900'
+    namespace: default
+
+  prometheus/2:
+    # curl http://localhost:8901/metrics
+    endpoint: '0.0.0.0:8901'
+    namespace: default
+
+  prometheus/3:
+    # curl http://localhost:8902/metrics
+    endpoint: '0.0.0.0:8902'
+    namespace: default
+
+    # Patroni:
+    # curl http://localhost:8008/metrics
+    # etcd:
+    # curl http://localhost:2381/metrics
+
+  # File
+  file/rotation_with_custom_settings:
+    path: /tmp/otel-logs.json
+    rotation:
+      max_megabytes: 10
+      max_days: 3
+      max_backups: 3
+      localtime: true
+
+  # debug:
+  #  verbosity: detailed
+
+service:
+  pipelines:
+    metrics:
+      receivers: [sqlquery/custom, postgresql]
+      processors: [memory_limiter, resourcedetection/system, resource, batch]
+      exporters: [prometheus]
+    metrics/2:
+      receivers: [sqlquery/pgbouncer]
+      processors: [memory_limiter, resourcedetection/system, resource, batch]
+      exporters: [prometheus/2]
+    metrics/3:
+      receivers: [sqlquery/pgbackrest]
+      processors: [memory_limiter, resourcedetection/system, resource, batch]
+      exporters: [prometheus/3]
+
+    logs:
+      receivers: [file_log/etcd, file_log/postgresql, file_log/patroni, file_log/pgbouncer, file_log/pgbackrest]
+      processors: [memory_limiter, resourcedetection/system, resource, batch]
+      exporters: [file/rotation_with_custom_settings]

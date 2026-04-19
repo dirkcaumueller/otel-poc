@@ -1,0 +1,29 @@
+receivers:
+
+  # Patroni Logs
+  file_log/patroni:
+    include: [/var/log/patroni/*.log]
+    start_at: end
+    operators:
+      - type: json_parser
+        if: body matches "^{.*}$"
+        timestamp:
+          parse_from: attributes.asctime
+          layout: '%F %T,%L'
+        severity:
+          parse_from: attributes.levelname
+          mapping: 
+            debug: DEBUG
+            info: INFO
+            warn: WARNING
+            error: ERROR
+            fatal: CRITICAL
+      - type: move
+        if: body != nil
+        from: body
+        to: attributes["log.record.original"]
+      # Must be last operator-action
+      - type: move
+        if: "attributes.message != nil"
+        from: attributes["message"]
+        to: body

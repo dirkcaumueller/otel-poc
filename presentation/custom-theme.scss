@@ -1,0 +1,495 @@
+/*-- scss:defaults --*/
+
+// ─── Fonts ───────────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap');
+
+$font-family-sans-serif:    'IBM Plex Sans', sans-serif;
+$presentation-heading-font: 'IBM Plex Mono', monospace;
+
+// ─── PostgreSQL Color Palette ────────────────────────────────────────────────
+$pg-navy:   #336791;   // PostgreSQL primary blue
+$pg-blue:   #008bb9;   // PostgreSQL secondary / link blue
+$pg-white:  #eef4f8;
+$pg-dark:   #0b1520;
+$pg-dark2:  #0f1e30;
+$pg-dark3:  #132840;
+$pg-slate:  #1d3a54;
+$pg-muted:  #3d6080;
+$pg-dim:    #2a4a68;
+
+$background-color:           $pg-dark;
+$body-color:                 #c2d8e8;
+$heading-color:              $pg-white;
+$link-color:                 $pg-blue;
+$selection-bg:               rgba($pg-navy, 0.4);
+
+// ─── Typography ──────────────────────────────────────────────────────────────
+$font-size-root:                   38px;
+$presentation-font-size-root:      38px;
+$presentation-heading-font-weight: 600;
+$presentation-h1-font-size:        1.7em;
+$presentation-h2-font-size:        1.05em;
+$presentation-h3-font-size:        0.72em;
+$presentation-heading-line-height: 1.15;
+$body-line-height:                 1.6;
+$presentation-block-margin:        14px;
+
+// ─── Structure ───────────────────────────────────────────────────────────────
+$border-radius: 0px;          // Zero rounding – hard edges only
+$border-color:  $pg-slate;
+$code-block-bg: #060e18;
+$code-color:    $pg-blue;
+
+/*-- scss:rules --*/
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+.reveal {
+  font-feature-settings: "tnum" 1, "kern" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ─── Background: subtle technical grid ───────────────────────────────────────
+.reveal .slide-background-content {
+  background-color: $pg-dark;
+  background-image:
+    linear-gradient(rgba($pg-navy, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba($pg-navy, 0.07) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 50% at 100% 0%, rgba($pg-blue, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 0% 100%, rgba($pg-navy, 0.08) 0%, transparent 55%);
+  background-size: 48px 48px, 48px 48px, 100% 100%, 100% 100%;
+}
+
+// ─── Slide base: left stripe + corner bracket ─────────────────────────────────
+.reveal .slides section {
+  padding: 2rem 3rem 2rem 3.5rem;
+  text-align: left;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, $pg-blue 0%, $pg-navy 55%, transparent 100%);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 24px; height: 24px;
+    border-top: 3px solid $pg-blue;
+    border-left: 3px solid $pg-blue;
+  }
+}
+
+// ─── Title Slide ─────────────────────────────────────────────────────────────
+.reveal .slides section.title-slide,
+.reveal .slides section:first-child {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem 3.5rem 3rem 4rem;
+
+  &::before {
+    // Replace left stripe with top stripe
+    width: 100%; height: 3px;
+    top: 0; left: 0; bottom: auto;
+    background: linear-gradient(90deg, $pg-blue 0%, $pg-navy 60%, transparent 100%);
+  }
+
+  &::after {
+    // Replace corner with bottom line
+    top: auto; bottom: 0; left: 0;
+    width: 100%; height: 1px;
+    border: none;
+    background: linear-gradient(90deg, $pg-navy 0%, transparent 100%);
+  }
+
+  h1.title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 1.85em;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: $pg-white;
+    margin-bottom: 0.2em;
+    text-transform: uppercase;
+
+    &::before {
+      display: block;
+      content: '-- presentation';
+      font-size: 0.28em;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: rgba($pg-blue, 0.7);
+      text-transform: lowercase;
+      margin-bottom: 0.6em;
+    }
+  }
+
+  .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4em;
+    font-weight: 300;
+    letter-spacing: 0.03em;
+    color: rgba($body-color, 0.5);
+    margin-bottom: 2.5em;
+    text-transform: none;
+
+    &::before { content: '/* '; color: $pg-dim; }
+    &::after  { content: ' */'; color: $pg-dim; }
+  }
+
+  .author {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.37em;
+    font-weight: 400;
+    color: $pg-blue;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.2em;
+
+    &::before { content: 'SELECT name FROM '; color: $pg-muted; font-weight: 300; }
+  }
+
+  .date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.31em;
+    font-weight: 300;
+    color: $pg-muted;
+    letter-spacing: 0.03em;
+    margin-top: 0.3em;
+
+    &::before { content: 'WHERE date = \''; color: $pg-dim; }
+    &::after  { content: '\'::date;';       color: $pg-dim; }
+  }
+
+  .institute {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.32em;
+    font-weight: 300;
+    color: $pg-muted;
+    margin-top: 0.15em;
+  }
+}
+
+// ─── Headings ─────────────────────────────────────────────────────────────────
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  color: $heading-color;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reveal h2 {
+  font-size: 0.92em;
+  font-weight: 600;
+  color: $pg-white;
+  margin-bottom: 0.9em;
+  padding-bottom: 0.45em;
+  border-bottom: 2px solid $pg-navy;
+  box-shadow: 0 3px 0 0 rgba($pg-blue, 0.25);
+
+  &::before {
+    content: '› ';
+    color: $pg-blue;
+    font-weight: 300;
+  }
+}
+
+.reveal h3 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.56em;
+  font-weight: 400;
+  color: $pg-blue;
+  letter-spacing: 0.14em;
+  margin-bottom: 0.4em;
+
+  &::before { content: '-- '; opacity: 0.45; }
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+.reveal p {
+  font-weight: 300;
+  color: rgba($body-color, 0.9);
+}
+
+.reveal strong {
+  font-weight: 700;
+  color: $pg-white;
+}
+
+.reveal em {
+  font-style: italic;
+  color: $pg-blue;
+}
+
+// ─── Lists ────────────────────────────────────────────────────────────────────
+.reveal ul, .reveal ol {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+
+  li {
+    padding: 0.38em 0 0.38em 2em;
+    position: relative;
+    font-weight: 300;
+    color: rgba($body-color, 0.85);
+    border-left: 1px solid rgba($pg-navy, 0.45);
+    margin-bottom: 2px;
+
+    &::before {
+      content: '→';
+      position: absolute;
+      left: 0.5em;
+      color: $pg-navy;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85em;
+    }
+  }
+}
+
+.reveal ol {
+  counter-reset: pg-counter;
+  li {
+    counter-increment: pg-counter;
+    &::before {
+      content: counter(pg-counter, decimal-leading-zero) ':';
+      font-size: 0.62em;
+      font-weight: 600;
+      color: $pg-blue;
+      top: 0.58em;
+      left: 0.2em;
+    }
+  }
+}
+
+// ─── Blockquotes ──────────────────────────────────────────────────────────────
+.reveal blockquote {
+  width: 100%;
+  background: rgba($pg-navy, 0.12);
+  border-left: 3px solid $pg-blue;
+  border-top: 1px solid rgba($pg-blue, 0.18);
+  border-bottom: 1px solid rgba($pg-blue, 0.18);
+  border-right: none;
+  border-radius: 0;
+  padding: 0.85em 1.3em;
+  margin: 0.7em 0;
+  font-size: 0.8em;
+  font-style: italic;
+  font-weight: 300;
+  color: rgba($body-color, 0.72);
+  box-shadow: none;
+
+  p { margin: 0; }
+}
+
+// ─── Code ─────────────────────────────────────────────────────────────────────
+.reveal code {
+  font-family: 'IBM Plex Mono', monospace;
+  background: rgba($pg-blue, 0.1);
+  color: $pg-blue;
+  border: 1px solid rgba($pg-blue, 0.2);
+  padding: 0.08em 0.38em;
+  border-radius: 0;
+  font-size: 0.8em;
+}
+
+.reveal pre {
+  background: $code-block-bg;
+  border: 1px solid $pg-slate;
+  border-top: 2px solid $pg-navy;
+  border-radius: 0;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  position: relative;
+
+  &::before {
+    content: 'SQL';
+    position: absolute;
+    top: 0; right: 0;
+    background: $pg-navy;
+    color: rgba($pg-white, 0.65);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.42em;
+    letter-spacing: 0.18em;
+    padding: 0.25em 0.8em;
+    font-weight: 600;
+  }
+
+  code {
+    background: transparent;
+    border: none;
+    color: rgba($body-color, 0.9);
+    padding: 1.2em;
+    font-size: 0.67em;
+    line-height: 1.65;
+  }
+}
+
+// ─── Tables ───────────────────────────────────────────────────────────────────
+.reveal table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.68em;
+  border: 1px solid $pg-slate;
+
+  th {
+    background: rgba($pg-navy, 0.38);
+    color: $pg-white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.78em;
+    padding: 0.65em 1em;
+    border-bottom: 2px solid $pg-navy;
+    border-right: 1px solid $pg-slate;
+    text-align: left;
+    &:last-child { border-right: none; }
+  }
+
+  td {
+    padding: 0.52em 1em;
+    color: rgba($body-color, 0.82);
+    border-bottom: 1px solid rgba($pg-slate, 0.5);
+    border-right: 1px solid rgba($pg-slate, 0.3);
+    font-weight: 300;
+    font-family: 'IBM Plex Mono', monospace;
+    &:last-child { border-right: none; }
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba($pg-navy, 0.07); }
+  tr:hover td { background: rgba($pg-blue, 0.07); }
+}
+
+// ─── Links ────────────────────────────────────────────────────────────────────
+.reveal a {
+  color: $pg-blue;
+  text-decoration: none;
+  border-bottom: 1px solid rgba($pg-blue, 0.4);
+
+  &:hover {
+    color: lighten($pg-blue, 12%);
+    border-bottom-color: $pg-blue;
+  }
+}
+
+// ─── Progress Bar ─────────────────────────────────────────────────────────────
+.reveal .progress {
+  height: 3px;
+  background: rgba($pg-navy, 0.3);
+  span { background: linear-gradient(90deg, $pg-navy 0%, $pg-blue 100%); }
+}
+
+// ─── Slide number ─────────────────────────────────────────────────────────────
+.reveal .slide-number {
+  background: transparent;
+  color: $pg-muted;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.43rem;
+  letter-spacing: 0.1em;
+  bottom: 1rem;
+  right: 1.5rem;
+  &::before { content: 'ROW '; }
+}
+
+// ─── Callouts ─────────────────────────────────────────────────────────────────
+.reveal .callout {
+  border-radius: 0;
+  font-size: 0.76em;
+  border-left-width: 3px;
+
+  &.callout-note {
+    border-color: $pg-blue;
+    background: rgba($pg-blue, 0.07);
+    border-top: 1px solid rgba($pg-blue, 0.18);
+    border-bottom: 1px solid rgba($pg-blue, 0.18);
+    border-right: 1px solid rgba($pg-blue, 0.08);
+  }
+  &.callout-tip     { border-color: #27ae60; background: rgba(#27ae60, 0.07); }
+  &.callout-warning { border-color: #e67e22; background: rgba(#e67e22, 0.07); }
+  &.callout-important { border-color: #c0392b; background: rgba(#c0392b, 0.07); }
+
+  .callout-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+}
+
+// ─── Section divider slides (.section class) ──────────────────────────────────
+.reveal .slides section.section {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  background: $pg-dark3;
+
+  &::before {
+    width: 100%; height: 3px;
+    top: 0; left: 0; bottom: auto;
+    background: linear-gradient(90deg, $pg-blue, $pg-navy, transparent);
+  }
+  &::after { display: none; }
+
+  h2 {
+    font-size: 1.55em;
+    font-weight: 600;
+    color: $pg-blue;
+    border: none;
+    box-shadow: none;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+
+    &::before {
+      display: block;
+      content: 'BEGIN;';
+      font-size: 0.3em;
+      color: rgba($pg-muted, 0.55);
+      letter-spacing: 0.12em;
+      margin-bottom: 0.6em;
+      font-weight: 300;
+    }
+  }
+
+  p {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.4em;
+    font-weight: 300;
+    color: $pg-muted;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    &::before { content: '-- '; opacity: 0.45; }
+  }
+}
+
+// ─── Highlight box (custom div) ───────────────────────────────────────────────
+.reveal .highlight-box {
+  background: rgba($pg-navy, 0.2);
+  border: 1px solid rgba($pg-blue, 0.22);
+  border-left: 3px solid $pg-blue;
+  border-radius: 0;
+  padding: 0.85em 1.3em;
+  margin: 0.5em 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8em;
+}
+
+// ─── Fragments ────────────────────────────────────────────────────────────────
+.reveal .fragment {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.reveal .fragment.fade-up {
+  transform: translateY(12px);
+  &.visible { transform: translateY(0); }
+}
+
+// ─── Columns ──────────────────────────────────────────────────────────────────
+.reveal .columns { gap: 2em; }
+
+// ─── Speaker notes ────────────────────────────────────────────────────────────
+.reveal aside.notes {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
