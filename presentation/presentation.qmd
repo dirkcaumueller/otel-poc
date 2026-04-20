@@ -14,11 +14,11 @@ format:
     toc: false
     margin: 0.08
     highlight-style: github-dark
+    code-block-height: 600px
     code-folding: hide
     code-wrap: true
     code-copy: false
     scrollable: false
-    center: false
     logo: images/proventa-venitus-logo.svg
 ---
 
@@ -35,21 +35,35 @@ format:
 
 ---
 
-## Proventa {auto-animate=true}
+## Proventa {.smaller}
 
-::: columns
-::: {.column width="40%"}
+:::: {.columns}
 
-- 
+::: {.column width="50%"}
+
+- Part of Venitus IT Solutions
+- Database Transformation Services
+- Customers in the private & public sector
+- Founder of Postgres Usergroup Frankfurt (Main)
+- Member of OSBA
+
+![](images/pug-ffm.png){width=150}
+![](images/osba.png){width=200}
 
 :::
 
-::: {.column width="60%"}
+::: {.column width="50%"}
 
+![](images/dirk_aumueller.svg){fig-align=center width=200}
+
+- Dirk Aumueller, Associate Partner
+
+- Generalist, not specialist!
+- 10+ years Postgres experience
 
 :::
-:::
 
+::::
 ---
 
 ## Why? - The reason for this talk! {.smaller}
@@ -226,7 +240,7 @@ log_stats = 0
 
 - [OTel Collector](https://opentelemetry.io/docs/collector/) is a vendor-agnostic implementation of how to receive, process & export telemetry data
   - Serves as unified agent / collector
-- [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) repository offers many recievers, processors & exporters
+- [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) repository offers many receivers, processors & exporters
 
 ![](./images/otelcol.svg){fig-align=center}
 
