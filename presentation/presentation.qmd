@@ -41,7 +41,7 @@ format:
 
 ::: {.column width="50%"}
 
-- Part of Venitus IT Solutions
+- A Venitus Company
 - Database Transformation Services
 - Customers in the private & public sector
 - Founder of Postgres Usergroup Frankfurt (Main)
