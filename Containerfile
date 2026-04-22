@@ -10,7 +10,7 @@ RUN dnf -y update --setopt install_weak_deps=false && \
     dnf install -y 'dnf-command(config-manager)' && \
     dnf config-manager --set-enabled crb && \
     dnf install -y epel-release && \
-    dnf install -y libssh2 awscli2 hostname wget zstd jq && \
+    dnf install -y libssh2 awscli2 hostname wget zstd jq less && \
     dnf install -y ${PGDG_REPO} && \
     dnf config-manager --set-disabled pgdg17 pgdg16 pgdg15 pgdg14 && \
     dnf config-manager --set-enabled pgdg-rhel10-extras && \
