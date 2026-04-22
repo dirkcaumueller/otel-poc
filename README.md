@@ -51,7 +51,7 @@ systemctl start otelcol-contrib
 
 > [!note]
 >
-> All credentials used in the different containers follow the pattern:
+> All credentials used in the container follow the pattern:
 > username = password
 >
 > Example:

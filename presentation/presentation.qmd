@@ -25,7 +25,7 @@ format:
 ## Agenda
 
 - Why? - The reason for this talk!
-- A typical PostgreSQL Installation
+- A typical PostgreSQL Setup
 - Component Logs & Metrics
 - Component Configuration
 - OpenTelemetry
@@ -237,7 +237,7 @@ log_stats = 0
 
 ## OpenTelemetry Collector {.smaller}
 
-- [OTel Collector](https://opentelemetry.io/docs/collector/) is a vendor-agnostic implementation of how to receive, process & export telemetry data
+- [OTel Collector](https://opentelemetry.io/docs/collector/) is a vendor-neutral implementation of how to receive, process & export telemetry data
   - Serves as unified agent / collector
 - [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) repository offers many receivers, processors & exporters
 
