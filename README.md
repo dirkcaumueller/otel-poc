@@ -8,6 +8,10 @@ This repository contains the OpenTelemetry Collector proof of concept for Postgr
 >
 > All changes within the container are ephemeral.
 
+> [!note]
+> 
+> The content of this POC was presented at [PGConf.DE 2026](https://pgconf.de) with the title [One Collector to Rule Them All: Unified Observability for PostgreSQL Platforms](https://www.postgresql.eu/events/pgconfde2026/schedule/session/7734-one-collector-to-rule-them-all-unified-observability-for-postgresql-platforms/) on 22.04.2026.
+
 ## Requirements
 
 Docker is required to jump start this project. Follow the installation steps in [Docker's documentation](https://www.docker.com/products/docker-desktop/).
@@ -81,10 +85,6 @@ cat /tmp/otel-logs.json | jq .
 ```
 
 ## Presentation
-
-> [!note]
-> 
-> The content of this POC was presented at [PGConf.DE 2026](https://pgconf.de) with the title [One Collector to Rule Them All: Unified Observability for PostgreSQL Platforms](https://www.postgresql.eu/events/pgconfde2026/schedule/session/7734-one-collector-to-rule-them-all-unified-observability-for-postgresql-platforms/) on 22.04.2026.
 
 The presentation is built with [Quarto](https://quarto.org/). Follow these steps to install it and its dependencies. In addition, there is an extension for VSCode available.
 
